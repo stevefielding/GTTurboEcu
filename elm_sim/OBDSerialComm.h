@@ -48,6 +48,8 @@ public:
 
     bool isEchoEnable();
 
+    bool isHeaderEnable();
+
     void setLineFeeds(bool status);
 
     void setMemory(bool status);

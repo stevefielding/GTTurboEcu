@@ -45,7 +45,7 @@ void GTTurboEcu::writePidNotSupported() {
 
 
 void GTTurboEcu::writePidResponse(String requestPid, uint8_t numberOfBytes, uint32_t value) {
-    _pidProcessor->writePidResponse(requestPid, numberOfBytes, value);
+    _pidProcessor->writePidResponse(requestPid, numberOfBytes, value, _connection->isHeaderEnable());
 }
 
 bool GTTurboEcu::processResponse(String command) {

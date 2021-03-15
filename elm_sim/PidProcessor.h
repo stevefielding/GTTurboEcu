@@ -21,7 +21,7 @@ public:
 
     bool registerMode01Pid(uint32_t pid);
 
-    void writePidResponse(String requestPid, uint8_t numberOfBytes, uint32_t value);
+    void writePidResponse(String requestPid, uint8_t numberOfBytes, uint32_t value, bool addHeader);
 
 private:
 

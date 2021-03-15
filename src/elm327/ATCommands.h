@@ -2,7 +2,7 @@
 #define GTTURBOECU_ATCommands_h
 
 
-#include <Arduino.h>
+//#include <Arduino.h>
 #include "OBDSerialComm.h"
 
 class ATCommands {

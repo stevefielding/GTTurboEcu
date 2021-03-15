@@ -12,7 +12,7 @@ extern HardwareSerial Serial;
 
 
 #define DO_DEBUG true
-#define DEBUG(x) do {if (DO_DEBUG) { Serial.println(x); } } while (0)
+#define DEBUG(x) do {if (DO_DEBUG) { printf(x); } } while (0)
 
 
 #define xtoc(x) ((x < 10) ? ('0' + x) : ('A' - 10 + x))

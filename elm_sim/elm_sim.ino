@@ -30,7 +30,7 @@ void setup() {
     Serial.begin(9600);
     gtTurboEcu.init(9600L);
     pinMode(LED_BUILTIN, OUTPUT);
-    delay(10000);
+    //delay(10000);
 
     /**
      * https://en.wikipedia.org/wiki/OBD-II_PIDs

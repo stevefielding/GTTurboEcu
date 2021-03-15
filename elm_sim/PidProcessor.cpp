@@ -21,16 +21,25 @@ bool PidProcessor::process(String command) {
     if (isSupportedPidRequest(pid)) {
         processed = true;
         uint32_t supportedPids = getSupportedPids(pid);
-        writePidResponse(command, 4, supportedPids);
+        writePidResponse(command, 4, supportedPids, _connection->isHeaderEnable());
     }
     return processed;
 }
 
-void PidProcessor::writePidResponse(String requestPid, uint8_t numberOfBytes, uint32_t value) {
+void PidProcessor::writePidResponse(String requestPid, uint8_t numberOfBytes, uint32_t value, bool addHeader) {
     uint8_t  nHexChars = PID_N_BYTES * N_CHARS_IN_BYTE +  numberOfBytes * N_CHARS_IN_BYTE ;
     char responseArray[nHexChars + 1]; // one more for termination char
     getFormattedResponse(responseArray, nHexChars, requestPid, value);
-    _connection->writeEndPidTo(responseArray);
+    String respWithHeader;
+    char cValue[2];
+    if (addHeader) {
+      sprintf(cValue, "%02X", PID_N_BYTES + numberOfBytes);
+      respWithHeader = "7E8" + String(cValue) + String(responseArray);
+    }
+    else
+      respWithHeader = String(responseArray);
+    DEBUG("RX PID: " + requestPid + " - TX: " + String(respWithHeader));
+    _connection->writeEndPidTo(respWithHeader.c_str());
 }
 
 /**
@@ -134,7 +143,7 @@ void PidProcessor::getFormattedResponse(char *response, uint8_t totalNumberOfCha
     String pidResponse = convertToPidResponse(pid);
     sprintf(response, mask.c_str(), pidResponse.c_str(), value);
 
-    DEBUG("RX PID: " + pid + " - TX: " + String(response));
+    //DEBUG("RX PID: " + pid + " - TX: " + String(response));
 }
 
 String PidProcessor::convertToPidResponse(String pid) {
@@ -148,9 +157,3 @@ void PidProcessor::resetPidMode01Array() {
         pidMode01Supported[i] = 0x0;
     }
 }
-
-
-
-
-
-

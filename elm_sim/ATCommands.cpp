@@ -24,9 +24,10 @@ void ATCommands::processCommand(String command) {
 
     // if space is enabled (ex: AT H[charPosition])
     uint8_t offset = 2;
-    if (command.charAt(2) == 0x20) {
-        offset = 3;
-    }
+    // Removed this because readData strips all whitespace irrespective of H setting
+    //if (command.charAt(2) == 0x20) {
+    //    offset = 3;
+    //}
 
     // refer to ELM327 specs
     String specificCommand = command.substring(offset, command.length());
@@ -79,20 +80,20 @@ void ATCommands::ATZ() {
     connection->setEcho(true);
     connection->setStatus(connection->IDLE);
     connection->writeTo(ID);
-    connection->writeEndOK();
+    connection->writeEnd();
 }
 
 // Print the version ID
 void ATCommands::ATI() {
     connection->setStatus(connection->READY);
     connection->writeTo(ID);
-    connection->writeEndOK();
+    connection->writeEnd();
 }
 
 // send description
 void ATCommands::ATDESC() {
     connection->writeTo(DESC);
-    connection->writeEndOK();
+    connection->writeEnd();
 }
 
 // set echoEnable 0=off 1=on
@@ -127,13 +128,17 @@ void ATCommands::ATHx(String cmd) {
 
 // ATSPx Define protocol 0=auto
 void ATCommands::ATSPx(String cmd) {
+    if (cmd.equals("SP0"))
+      protocolStr = String("A0");
+    else
+      protocolStr = cmd.substring(2, cmd.length());
     connection->writeEndOK();
 }
 
 // set protocol
 void ATCommands::ATDPN() {
-    connection->writeTo(PROTOCOL);
-    connection->writeEndOK();
+    connection->writeTo(protocolStr.c_str());
+    connection->writeEnd();
 }
 
 // AT AT2 adaptative time control

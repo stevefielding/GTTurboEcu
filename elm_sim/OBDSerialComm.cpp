@@ -72,7 +72,7 @@ void OBDSerialComm::setToDefaults() {
     setStatus(READY);
     setWhiteSpaces(true);
     setHeaders(false);
-    setLineFeeds(false);
+    setLineFeeds(true);
     setMemory(false);
 }
 
@@ -136,7 +136,7 @@ String OBDSerialComm::readData() {
     //DEBUG(rxData); 
     //DEBUG("OBDSerialComm:readData: text end");
     if (isEchoEnable()) {
-        writeTo(rxData.c_str());
+        writeTo((rxData + '\r').c_str());
     }
     return rxData;
 }
@@ -152,6 +152,10 @@ long OBDSerialComm::getBaudRate() {
 
 bool OBDSerialComm::isEchoEnable() {
     return echoEnable;
+}
+
+bool OBDSerialComm::isHeaderEnable() {
+    return headersEnabled;
 }
 
 void OBDSerialComm::setEcho(bool echo) {

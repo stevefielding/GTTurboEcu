@@ -49,6 +49,7 @@ private:
 
     bool isATCommand(String command);
 
+    String protocolStr = PROTOCOL;
 };
 
 #endif
