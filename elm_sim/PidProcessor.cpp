@@ -34,7 +34,7 @@ void PidProcessor::writePidResponse(String requestPid, uint8_t numberOfBytes, ui
     char cValue[2];
     if (addHeader) {
       sprintf(cValue, "%02X", PID_N_BYTES + numberOfBytes);
-      respWithHeader = "7E8" + String(cValue) + String(responseArray);
+      respWithHeader = ECU_ID + String(cValue) + String(responseArray);
     }
     else
       respWithHeader = String(responseArray);

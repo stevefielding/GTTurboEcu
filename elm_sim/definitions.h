@@ -29,6 +29,9 @@
 #define DESC  "GTTurbo OBD2 Arduino libs, based on ELM"
 #define PROTOCOL "6" // canbus 500k 11 bit protocol id for elm.
 
+// ECU ID
+#define ECU_ID "7E8"
+
 // Char representing end of serial string
 #define SERIAL_END_CHAR  0x0D
 #define SERIAL_READ_TIMEOUT 20000L
