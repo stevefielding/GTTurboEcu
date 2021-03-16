@@ -2,20 +2,7 @@
 #include "GTTurboEcu.h"
 #include "definitions.h"
 
-
-/**
- * Import and configure GTTurboEcu Library
- *
- * This values are related to the bluetooth configuration
- * library SoftwareSerial.h is use to connect the bluetooth device
- * by identifying:
- * 1) baudRate
- * 2) rxPin
- * 3) txPin
- *
- */
-GTTurboEcu gtTurboEcu(9600L);
-
+GTTurboEcu gtTurboEcu;
 
 /**
  * definition of a provider for fake sensor values
@@ -89,91 +76,91 @@ void loop() {
      * and send a response containing the sensor value
      */
 
+    if (!pidRequest.equals("")) {
+
+      /**
+       * 0105 Engine coolant temperature
+      */
+      if (pidRequest.equalsIgnoreCase("0105")) {
+
+          uint8_t numberOfBytes = 1;
+          uint32_t sensorValue = FakeSensorValueProvider();
+
+          /**
+           * Response parameters example:
+           * pidRequest - we send the pid we received to identify it
+           * numberOfBytes - the number of bytes this PID value has, see OBDII PID specifications
+           * sensorValue - the value of the sensor
+           */
+          gtTurboEcu.writePidResponse(pidRequest, numberOfBytes, sensorValue);
+          return;
+      }
+
+      /**
+       * 010B intake manifold abs pressure
+       */
+      if (pidRequest.equalsIgnoreCase("010B")) {
+          gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
+          return;
+      }
+
+      /**
+       * 010C engine rpm
+       */
+      if (pidRequest.equalsIgnoreCase("010C")) {
+          uint16_t rpmValue = FakeSensorValueProvider() * 100;
+
+          // Note: this time the PID value has two bytes
+          gtTurboEcu.writePidResponse(pidRequest, 2, rpmValue);
+          return;
+      }
+
+      /**
+       * 0D Vehicle speed
+       */
+      if (pidRequest.equalsIgnoreCase("010D")) {
+          gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
+          return;
+      }
+
+      /**
+       * 33 Absolute Barometric Pressure
+       */
+      if (pidRequest.equalsIgnoreCase("0133")) {
+          gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
+          return;
+      }
+
+      /**
+       * 0146 Ambient air temperature
+       */
+      if (pidRequest.equalsIgnoreCase("0146")) {
+          gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
+          return;
+      }
+
+      /**
+       * 015C Engine oil temperature
+       */
+      if (pidRequest.equalsIgnoreCase("015C")) {
+          gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
+          return;
+      }
+
+      /**
+       * 015C Engine oil temperature
+       */
+      else if (pidRequest.equalsIgnoreCase("0170")) {
+          gtTurboEcu.writePidResponse(pidRequest, 9, FakeSensorValueProvider());
+          return;
+      }
 
 
-    /**
-     * 0105 Engine coolant temperature
-    */
-    if (pidRequest.equalsIgnoreCase("0105")) {
-
-        uint8_t numberOfBytes = 1;
-        uint32_t sensorValue = FakeSensorValueProvider();
-
-        /**
-         * Response parameters example:
-         * pidRequest - we send the pid we received to identify it
-         * numberOfBytes - the number of bytes this PID value has, see OBDII PID specifications
-         * sensorValue - the value of the sensor
-         */
-        gtTurboEcu.writePidResponse(pidRequest, numberOfBytes, sensorValue);
-        return;
+      /**
+       * If pid not implemented, report it as not implemented
+       */
+      gtTurboEcu.writePidNotSupported();
     }
-
-    /**
-     * 010B intake manifold abs pressure
-     */
-    if (pidRequest.equalsIgnoreCase("010B")) {
-        gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
-        return;
-    }
-
-    /**
-     * 010C engine rpm
-     */
-    if (pidRequest.equalsIgnoreCase("010C")) {
-        uint16_t rpmValue = FakeSensorValueProvider() * 100;
-
-        // Note: this time the PID value has two bytes
-        gtTurboEcu.writePidResponse(pidRequest, 2, rpmValue);
-        return;
-    }
-
-    /**
-     * 0D Vehicle speed
-     */
-    if (pidRequest.equalsIgnoreCase("010D")) {
-        gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
-        return;
-    }
-
-    /**
-     * 33 Absolute Barometric Pressure
-     */
-    if (pidRequest.equalsIgnoreCase("0133")) {
-        gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
-        return;
-    }
-
-    /**
-     * 0146 Ambient air temperature
-     */
-    if (pidRequest.equalsIgnoreCase("0146")) {
-        gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
-        return;
-    }
-
-    /**
-     * 015C Engine oil temperature
-     */
-    if (pidRequest.equalsIgnoreCase("015C")) {
-        gtTurboEcu.writePidResponse(pidRequest, 1, FakeSensorValueProvider());
-        return;
-    }
-
-    /**
-     * 015C Engine oil temperature
-     */
-    else if (pidRequest.equalsIgnoreCase("0170")) {
-        gtTurboEcu.writePidResponse(pidRequest, 9, FakeSensorValueProvider());
-        return;
-    }
-
-
-    /**
-     * If pid not implemented, report it as not implemented
-     */
-    gtTurboEcu.writePidNotSupported();
-
 
 } // loop end
 

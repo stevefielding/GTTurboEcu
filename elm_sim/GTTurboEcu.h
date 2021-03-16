@@ -20,7 +20,7 @@ public:
      * @param txPin - the Arduino TX pin for the Bluetooth module (serial port)
      * @return
      */
-    GTTurboEcu(uint32_t baudRate);
+    GTTurboEcu();
 
     ~GTTurboEcu();
 

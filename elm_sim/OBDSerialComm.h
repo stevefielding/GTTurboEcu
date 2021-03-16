@@ -67,7 +67,8 @@ private:
     // Serial parameters
     //SoftwareSerial *serial; // lib to communicate with bluetooth
     uint32_t boudRate; // Serial Boud Rate
-
+    int rxIndex;
+    char rxString [40];  // why 40? Not sure what the max string length is?
 
 
     STATUS status; // Operation status

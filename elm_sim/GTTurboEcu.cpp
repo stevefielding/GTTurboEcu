@@ -1,12 +1,7 @@
 #include "GTTurboEcu.h"
 
 
-GTTurboEcu::GTTurboEcu(uint32_t baudRate) {
-    //_connection = new OBDSerialComm(baudRate);
-    //_atProcessor = new ATCommands(_connection);
-    //_pidProcessor = new PidProcessor(_connection);
-
-    //_lastCommand = "";
+GTTurboEcu::GTTurboEcu() {
 }
 
 GTTurboEcu::~GTTurboEcu() {
@@ -22,13 +17,14 @@ void GTTurboEcu::init(uint32_t baudRate) {
 
 String GTTurboEcu::readPidRequest() {
     String rxData;
-    do {
-        rxData = _connection->readData();
-        rxData.toUpperCase();
-        // TODO ignore spaces, and all control chars (tab, etc)
-        // TODO accept single carriage return as repeat last command at or pid
-        // ignore null i.e 00
-    } while (processResponse(rxData));
+    rxData = _connection->readData();
+    if (rxData.length() != 0) {
+      rxData.toUpperCase();
+      // accept single carriage return as repeat last command at or pid
+      if (processResponse(rxData)) {
+        rxData = "";
+      }
+    }
     return rxData;
 }
 

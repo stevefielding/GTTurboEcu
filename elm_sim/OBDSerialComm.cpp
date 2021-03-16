@@ -16,6 +16,7 @@ OBDSerialComm::OBDSerialComm(uint32_t baudRate) {
     //  writeTo("Hello\n");
     //  delay(1000);
     //}
+    rxIndex = 0;
 }
 
 OBDSerialComm::~OBDSerialComm() {
@@ -100,44 +101,40 @@ void OBDSerialComm::writeEndPidTo(char const *response) {
 }
 
 String OBDSerialComm::readData() {
-    char str[40];
-    char rxChars[3];
+    String rxData;
     int serInt = 0;
-    int i=0;
-    //DEBUG("baudrate:");
-    //DEBUG(getBaudRate());
-    //DEBUG("serial timeout:");
-    //DEBUG(SERIAL_READ_TIMEOUT);
-    //Serial2.println("SerComs is alive2");
-    //serial->flush(); // temp remove this
-    //Serial2.flush();
-    //String rxData = serial->readStringUntil(SERIAL_END_CHAR);
-    // Read serial chars as they become available.
-    // Discard all control chars and white space
-    while (Serial2.readBytes(rxChars,1) != 0) {
-      serInt = (int) rxChars[0];
+
+    // Read serial data whilst available
+    while (Serial2.available() > 0) {
+      serInt = Serial2.read();
       if (serInt == 0x0d)
         break;
-      if (serInt >= 0x21 && serInt <= 0x7e) {
-        str[i++] = rxChars[0];
-      }
+      if (serInt >= 0x21 && serInt <= 0x7e)
+        rxString[rxIndex++] = (char) serInt;
     }
-    // Special case of lone CR. Return the lone CR, as this is used to trigger a 
+    // In most cases the CR, which terminates the serial stream, is discarded. However,
+    // there is a special case of a lone CR. Return the lone CR, as this is used to trigger a 
     // repeat of the last command.
-    if (i == 0 && serInt == 0x0d) {
-      str[0] = '\r';
-      str[1] = '\0';
-    }
-    else
-      str[i] = '\0';
-    String rxData = String(str);
-    //String rxData = Serial2.readStringUntil(SERIAL_END_CHAR);
-    //DEBUG("OBDSerialComm:readData: text begin");
-    //DEBUG(rxData); 
-    //DEBUG("OBDSerialComm:readData: text end");
-    if (isEchoEnable()) {
+    // Check for CR command terminator
+    if (serInt == 0x0d) {
+      if (rxIndex == 0) {
+        rxString[0] = '\r';  // keep lone CR
+        rxString[1] = '\0';  // and add null terminator
+      }
+      else {
+        rxString[rxIndex] = '\0';    // add null terminator
+      }
+      rxData = String(rxString);     // Return the string
+      rxIndex = 0;                   // and reset the index ready for the next command
+      if (isEchoEnable()) {
         writeTo((rxData + '\r').c_str());
     }
+    }
+    // CR has not been received, so return an empty string
+    else {
+      rxData = "";
+    }
+
     return rxData;
 }
 
