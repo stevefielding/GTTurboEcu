@@ -62,13 +62,18 @@ public:
 
     void writeEndPidTo(char const *string);
 
+    void serStreamWrite();
+    
 private:
 
     // Serial parameters
     //SoftwareSerial *serial; // lib to communicate with bluetooth
     uint32_t boudRate; // Serial Boud Rate
     int rxIndex;
-    char rxString [40];  // why 40? Not sure what the max string length is?
+    char rxString [MAX_RX_TX_CMD_LEN];  // why 40? Not sure what the max string length is?
+    int txInPtr;
+    int txOutPtr;
+    char txFifo [MAX_RX_TX_CMD_LEN];  // why 40? Not sure what the max string length is?
 
 
     STATUS status; // Operation status

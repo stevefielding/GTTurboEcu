@@ -43,5 +43,6 @@ const uint8_t N_MODE01_INTERVALS = 7;
 const uint8_t PID_INTERVAL_OFFSET = 0x20;
 
 
+#define MAX_RX_TX_CMD_LEN 40
 
 #endif //GTTURBOECU_DEFINITIONS_H

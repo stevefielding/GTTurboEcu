@@ -64,10 +64,7 @@ void loop() {
      *
      * GTTurboEcu receives Pid Request
      */
-    //DEBUG("Starting readPidRequest"); 
     String pidRequest = gtTurboEcu.readPidRequest();
-    //DEBUG("Finished readPidRequest"); 
-
 
     /**
      * After receiving a PID(sensor) request
@@ -161,7 +158,8 @@ void loop() {
        */
       gtTurboEcu.writePidNotSupported();
     }
-
+    gtTurboEcu.serStreamWrite();
+     
 } // loop end
 
 

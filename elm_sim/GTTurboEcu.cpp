@@ -44,6 +44,10 @@ void GTTurboEcu::writePidResponse(String requestPid, uint8_t numberOfBytes, uint
     _pidProcessor->writePidResponse(requestPid, numberOfBytes, value, _connection->isHeaderEnable());
 }
 
+void GTTurboEcu::serStreamWrite() {
+    _connection->serStreamWrite();
+}
+
 bool GTTurboEcu::processResponse(String command) {
 
     //TODO: check for no 0X0D char in command, return ? and >

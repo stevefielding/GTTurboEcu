@@ -81,6 +81,8 @@ public:
 
     void init(uint32_t baudRate);
 
+    void serStreamWrite();
+    
 private:
 
     OBDSerialComm *_connection;

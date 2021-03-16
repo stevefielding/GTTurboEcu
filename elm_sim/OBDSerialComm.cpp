@@ -10,13 +10,9 @@ OBDSerialComm::OBDSerialComm(uint32_t baudRate) {
     Serial2.setTimeout(SERIAL_READ_TIMEOUT);
     //Serial2.println("SerComs is alive1");
     setToDefaults();
-    //while (true) {
-      //Serial2.println("Hello");
-    //  Serial.println("Hello");
-    //  writeTo("Hello\n");
-    //  delay(1000);
-    //}
     rxIndex = 0;
+    txInPtr = 0;
+    txOutPtr = 0;
 }
 
 OBDSerialComm::~OBDSerialComm() {
@@ -24,6 +20,19 @@ OBDSerialComm::~OBDSerialComm() {
     Serial2.end();
 }
 
+void OBDSerialComm::serStreamWrite() {
+    char txChar;
+    int serTxSpace = Serial2.availableForWrite();
+    while (serTxSpace > 0) {
+      serTxSpace--;
+      if (txOutPtr == txInPtr)
+        break;
+      txChar = txFifo[txOutPtr++];
+      if (txOutPtr == MAX_RX_TX_CMD_LEN)
+        txOutPtr = 0;
+      Serial2.write(txChar);
+    }
+}
 
 void OBDSerialComm::writeEnd() {
 
@@ -79,13 +88,26 @@ void OBDSerialComm::setToDefaults() {
 
 void OBDSerialComm::writeTo(char const *response) {
     //serial->write(response);
-    Serial2.write(response);
+    //Serial2.write(response);
+    int i;
+    char txChar;
+    for (i = 0; i < MAX_RX_TX_CMD_LEN; i++) {
+      txChar = response[i];
+      if (txChar == '\0')
+        break;
+      txFifo[txInPtr++] = txChar;
+      if (txInPtr == MAX_RX_TX_CMD_LEN)
+        txInPtr = 0;
+    }
 }
 
 
 void OBDSerialComm::writeTo(uint8_t cChar) {
     //serial->write(cChar);
-    Serial2.write(cChar);
+    //Serial2.write(cChar);
+    txFifo[txInPtr++] = cChar;
+    if (txInPtr == MAX_RX_TX_CMD_LEN)
+      txInPtr = 0;
 }
 
 void OBDSerialComm::writeEndPidTo(char const *response) {
