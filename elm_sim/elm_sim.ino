@@ -40,17 +40,20 @@ void setup() {
 
 int loopCnt=0;
 
+// Measured 25uS per loop pass. With or without debug prints
+// Assume that the scope was unable to capture the occasionally longer passes
+// Replaced digitalWrite and removed serial flush from WriteToEnd, and still 25uS per pass.
+// I do not understand what is happening.
 void loop() {
-   //Serial.print("LoopCnt: ");
-   //Serial.println(loopCnt);
-   //String junk = "junk";
-   //DEBUG("Testing DEBUG print: " + junk);
+   
    if (loopCnt == 0) {
-      digitalWrite(LED_BUILTIN, HIGH);
+      //digitalWrite(LED_BUILTIN, HIGH);
+      //PIOB->PIO_SODR = PIO_SODR_P26;  // much faster than digitalWrite(LED_BUILTIN, HIGH);
       loopCnt = 1;
    }
    else {
-      digitalWrite(LED_BUILTIN, LOW);
+      //digitalWrite(LED_BUILTIN, LOW);
+      //PIOB->PIO_CODR = PIO_CODR_P26;
       loopCnt = 0;
    }
 

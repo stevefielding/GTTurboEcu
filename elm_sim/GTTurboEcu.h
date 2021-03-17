@@ -96,6 +96,10 @@ private:
     bool processResponse(String command);
 
     bool isValidHex(const char *pid);
+
+    String rxDataTemp;
+
+    String emptyString;
 };
 
 #endif

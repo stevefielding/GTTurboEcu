@@ -11,10 +11,9 @@
 //extern HardwareSerial Serial;
 
 
-#define DO_DEBUG true
+//#define DO_DEBUG true
+#define DO_DEBUG false
 #define DEBUG(x) do {if (DO_DEBUG) { Serial.println(x); } } while (0)
-//#define DEBUG(x) Serial.println(x)
-
 
 #define xtoc(x) ((x < 10) ? ('0' + x) : ('A' - 10 + x))
 #define getNumOfHexChars(nBytes) (nBytes * 2)

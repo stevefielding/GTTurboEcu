@@ -74,7 +74,8 @@ private:
     int txInPtr;
     int txOutPtr;
     char txFifo [MAX_RX_TX_CMD_LEN];  // why 40? Not sure what the max string length is?
-
+    String rxDataTemp;
+    String emptyString;
 
     STATUS status; // Operation status
     bool echoEnable; // echoEnable command after received

@@ -11,9 +11,34 @@ void GTTurboEcu::init(uint32_t baudRate) {
     _connection = new OBDSerialComm(baudRate);
     _atProcessor = new ATCommands(_connection);
     _pidProcessor = new PidProcessor(_connection);
-
+    emptyString = "";
     _lastCommand = "";
 }
+
+#define NEW_PID_REQUEST
+// 12uS
+#ifdef NEW_PID_REQUEST
+String GTTurboEcu::readPidRequest() {
+    rxDataTemp = _connection->readData();
+    PIOB->PIO_SODR = PIO_SODR_P26;  // much faster than digitalWrite(LED_BUILTIN, HIGH);
+    if (rxDataTemp.length() != 0) {
+      rxDataTemp.toUpperCase();
+      // accept single carriage return as repeat last command at or pid
+      if (processResponse(rxDataTemp)) {
+        PIOB->PIO_CODR = PIO_CODR_P26;
+        return emptyString;
+      }
+      else {
+        PIOB->PIO_CODR = PIO_CODR_P26;
+        return rxDataTemp;
+      }
+    }
+    else {
+      PIOB->PIO_CODR = PIO_CODR_P26;
+      return emptyString;
+    }
+}
+#else
 
 String GTTurboEcu::readPidRequest() {
     String rxData;
@@ -28,7 +53,7 @@ String GTTurboEcu::readPidRequest() {
     return rxData;
 }
 
-
+#endif
 
 bool GTTurboEcu::registerMode01Pid(uint32_t pid) {
     return(_pidProcessor->registerMode01Pid(pid));
@@ -48,6 +73,7 @@ void GTTurboEcu::serStreamWrite() {
     _connection->serStreamWrite();
 }
 
+// 75 uS execution time, but it does not execute all that often
 bool GTTurboEcu::processResponse(String command) {
 
     //TODO: check for no 0X0D char in command, return ? and >

@@ -13,6 +13,7 @@ OBDSerialComm::OBDSerialComm(uint32_t baudRate) {
     rxIndex = 0;
     txInPtr = 0;
     txOutPtr = 0;
+    emptyString = "";
 }
 
 OBDSerialComm::~OBDSerialComm() {
@@ -53,7 +54,7 @@ void OBDSerialComm::writeEnd() {
     writeTo('>');
 
     //serial->flush();
-    Serial2.flush();
+    //Serial2.flush();
 };
 
 
@@ -122,6 +123,58 @@ void OBDSerialComm::writeEndPidTo(char const *response) {
     writeEnd();
 }
 
+#define NEW_READ_DATA
+#ifdef NEW_READ_DATA
+// This function takes 8.8 uS to execute. Why?
+// Seems to be 6uS just to create local String rxData
+// Cut time to 3.2uS by creating a private class var rxDataTemp.
+// This is a cautionary tale for creating Strings as vars local to function
+// Best result, 0.5uS. Return predefined private class var emptyString in the simplest case
+String OBDSerialComm::readData() {
+    int serInt = 0;
+
+    // Read serial data whilst available
+    int rxCharsAvailable = Serial2.available();
+    if (rxCharsAvailable != 0) {
+      while (rxCharsAvailable-- > 0) {
+        serInt = Serial2.read();
+        if (serInt == 0x0d)
+          break;
+        if (serInt >= 0x21 && serInt <= 0x7e)
+          rxString[rxIndex++] = (char) serInt;
+      }
+      // In most cases the CR, which terminates the serial stream, is discarded. However,
+      // there is a special case of a lone CR. Return the lone CR, as this is used to trigger a 
+      // repeat of the last command.
+      // Check for CR command terminator
+      if (serInt == 0x0d) {
+        if (rxIndex == 0) {
+          rxString[0] = '\r';  // keep lone CR
+          rxString[1] = '\0';  // and add null terminator
+        }
+        else {
+          rxString[rxIndex] = '\0';    // add null terminator
+        }
+        rxDataTemp = String(rxString);     // Return the string
+        rxIndex = 0;                   // and reset the index ready for the next command
+        //if (isEchoEnable()) {
+        if (echoEnable) {
+          writeTo((rxDataTemp + '\r').c_str());
+        }
+      }
+      // CR has not been received, so return an empty string
+      else {
+        rxDataTemp = "";
+      }
+    }
+    else {
+      return emptyString;
+    }
+    return rxDataTemp;
+    
+}
+#else
+
 String OBDSerialComm::readData() {
     String rxData;
     int serInt = 0;
@@ -159,7 +212,7 @@ String OBDSerialComm::readData() {
 
     return rxData;
 }
-
+#endif
 
 void OBDSerialComm::setBaudRate(uint32_t rate) {
     this->boudRate = rate;
